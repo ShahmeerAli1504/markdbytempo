@@ -40,7 +40,7 @@ npm run dev
 | To… | Edit |
 |---|---|
 | Name, bio, tagline, follower count, Instagram | `lib/athletes.js` |
-| Photos | Replace the files in `public/athletes/tempo/` and keep the same names (`avatar.jpg`, `cover.jpg`, `gallery-1.jpg` to `gallery-4.jpg`). See the README.txt in that folder. |
+| Photos | Replace the files in `public/athletes/jaffet-corona/` and keep the same names (`avatar.jpg`, `cover.jpg`, `kit-front.jpg`, `kit-back.jpg`, `kit-side.jpg`, `gallery-1.jpg` to `gallery-4.jpg`). See the README.txt in that folder. |
 | Goal, story, sponsor-by date, campaign status | the `campaigns` entry in `lib/athletes.js` (`goal_cents` is in cents, so $1,500 = `150000`) |
 | Sponsor spots and prices | `spots` in `lib/athletes.js`. Don't change a spot's `id` once pledges exist. |
 | Race-day photos after the race | Add the files to the folder and list them under `raceDay` in `lib/athletes.js`. |

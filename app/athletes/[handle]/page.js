@@ -4,6 +4,8 @@ import Avatar from '@/components/Avatar';
 import CampaignCard from '@/components/CampaignCard';
 import JsonLd from '@/components/JsonLd';
 import Gallery from '@/components/Gallery';
+import KitMap from '@/components/KitMap';
+import SponsorTiers from '@/components/SponsorTiers';
 import { getAthlete, getAthletes } from '@/lib/data';
 import { compactNumber, externalUrl, igUrl } from '@/lib/format';
 import { site } from '@/lib/site';
@@ -69,7 +71,7 @@ export default async function AthletePage({ params }) {
               </div>
             </div>
             <div className="cta-actions">
-              {a.instagram && <a href={igUrl(a.instagram)} className="btn btn-ghost" target="_blank" rel="noopener noreferrer">Instagram</a>}
+              {a.instagram && <a href={igUrl(a.instagram)} className="btn btn-ghost" target="_blank" rel="noopener noreferrer">{a.instagram.startsWith('@') ? a.instagram : 'Instagram'}</a>}
               {a.website && <a href={externalUrl(a.website)} className="btn btn-ghost" target="_blank" rel="noopener noreferrer">Website</a>}
               {live && <Link href={`/campaigns/${live.slug}#sponsor`} className="btn btn-primary">Sponsor {a.display_name.split(' ')[0]}</Link>}
             </div>
@@ -79,11 +81,54 @@ export default async function AthletePage({ params }) {
 
       <section className="section-tight">
         <div className="wrap" style={{ display: 'grid', gap: 48 }}>
-          {a.bio && (
-            <div className="prose">
-              <h2 style={{ marginTop: 0 }}>About</h2>
-              {a.bio.split(/\n+/).map((p, i) => <p key={i}>{p}</p>)}
+          {a.profile?.length ? (
+            <div className="profile">
+              <div className="profile-intro">
+                <div>
+                  <span className="eyebrow">{a.profile[0].title}</span>
+                  <p className="profile-lead">{a.profile[0].body}</p>
+                </div>
+                {a.facts?.length > 0 && (
+                  <dl className="profile-facts">
+                    {a.facts.map((f) => (
+                      <div key={f.label}>
+                        <dt className="mono">{f.label}</dt>
+                        <dd>{f.value}</dd>
+                      </div>
+                    ))}
+                    {a.instagram && (
+                      <div>
+                        <dt className="mono">Instagram</dt>
+                        <dd><a href={igUrl(a.instagram)} target="_blank" rel="noopener noreferrer">{a.instagram}</a></dd>
+                      </div>
+                    )}
+                  </dl>
+                )}
+              </div>
+              <div className="profile-grid">
+                {a.profile.slice(1).map((sec, i) => (
+                  <article key={sec.id} className="profile-sec">
+                    <span className="profile-num mono">{String(i + 1).padStart(2, '0')}</span>
+                    <h2>{sec.title}</h2>
+                    {sec.body.split(/\n+/).map((para, j) => <p key={j}>{para}</p>)}
+                    {sec.pull && <blockquote className="profile-pull">“{sec.pull}”</blockquote>}
+                  </article>
+                ))}
+              </div>
             </div>
+          ) : (
+            a.bio && (
+              <div className="prose">
+                <h2 style={{ marginTop: 0 }}>About</h2>
+                {a.bio.split(/\n+/).map((p, i) => <p key={i}>{p}</p>)}
+              </div>
+            )
+          )}
+          {live?.tiers?.length > 0 && (
+            <>
+              <KitMap photos={a.kit_photos} spots={live.spots} name={a.display_name} campaignHref={`/campaigns/${live.slug}`} />
+              <SponsorTiers tiers={live.tiers} spots={live.spots} campaignHref={`/campaigns/${live.slug}`} />
+            </>
           )}
           <Gallery photos={a.gallery} title="Training" name={a.display_name} />
           <div>

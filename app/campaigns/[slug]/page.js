@@ -8,6 +8,8 @@ import SponsorCard from '@/components/SponsorCard';
 import InviteButton from '@/components/InviteButton';
 import Story from '@/components/Story';
 import Gallery from '@/components/Gallery';
+import KitMap from '@/components/KitMap';
+import SponsorTiers from '@/components/SponsorTiers';
 import Image from 'next/image';
 import JsonLd from '@/components/JsonLd';
 import { getCampaign, getCampaigns } from '@/lib/data';
@@ -103,7 +105,7 @@ export default async function CampaignPage({ params }) {
                   <div className="muted small">
                     {a.location}
                     {a.followers > 0 ? ` · ${compactNumber(a.followers)} followers` : ''}
-                    {a.instagram ? <> · <a href={igUrl(a.instagram)} target="_blank" rel="noopener noreferrer">Instagram</a></> : null}
+                    {a.instagram ? <> · <a href={igUrl(a.instagram)} target="_blank" rel="noopener noreferrer">{a.instagram.startsWith('@') ? a.instagram : 'Instagram'}</a></> : null}
                   </div>
                 </div>
               </div>
@@ -141,6 +143,17 @@ export default async function CampaignPage({ params }) {
                 <Gallery photos={a.gallery} title="On the road to race day" name={a.display_name} />
               </div>
 
+              {c.tiers?.length ? (
+                <>
+                  <div style={{ marginTop: 56 }}>
+                    <KitMap photos={a.kit_photos} spots={c.spots} name={a.display_name} />
+                  </div>
+                  <div style={{ marginTop: 56 }}>
+                    <SponsorTiers tiers={c.tiers} spots={c.spots} />
+                  </div>
+                </>
+              ) : (
+                <>
               <h2 style={{ fontSize: '2.2rem', marginTop: 48 }}>Sponsor spots</h2>
               <div className="spot-list">
                 {c.spots.map((s) => {
@@ -160,6 +173,8 @@ export default async function CampaignPage({ params }) {
                   );
                 })}
               </div>
+                </>
+              )}
 
               <h2 style={{ fontSize: '2.2rem', marginTop: 48 }}>Sponsors ({c.sponsors.length})</h2>
               {c.sponsors.length ? (

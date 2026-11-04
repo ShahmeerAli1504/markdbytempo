@@ -1,8 +1,9 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 import { SubmitButton } from './ActionForm';
 import { SPOT_KINDS } from '@/lib/site';
+import { PICK_EVENT } from './pickSpot';
 
 const fmt = (c) => `$${(c / 100).toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
 
@@ -13,6 +14,21 @@ export default function SponsorForm({ action, campaignId, spots = [], athleteNam
   const [spotId, setSpotId] = useState(first?.id || '');
   const [amount, setAmount] = useState(first ? String(first.price_cents / 100) : '50');
   const current = spots.find((s) => s.id === spotId);
+
+  // Kit map / package buttons (or a ?spot= link) can pre-select a placement.
+  useEffect(() => {
+    const select = (id) => {
+      const s = spots.find((x) => x.id === id && !(x.quantity && (x.claimed || 0) >= x.quantity));
+      if (!s) return;
+      setSpotId(s.id);
+      setAmount(String(s.price_cents / 100));
+    };
+    const fromUrl = new URLSearchParams(window.location.search).get('spot');
+    if (fromUrl) select(fromUrl);
+    const onPick = (e) => select(e.detail);
+    window.addEventListener(PICK_EVENT, onPick);
+    return () => window.removeEventListener(PICK_EVENT, onPick);
+  }, [spots]);
 
   if (state?.ok) {
     return (
@@ -33,7 +49,7 @@ export default function SponsorForm({ action, campaignId, spots = [], athleteNam
         <label>Company URL<input name="company_url" tabIndex={-1} autoComplete="off" /></label>
       </div>
 
-      <fieldset className="spot-picker">
+      <fieldset className={`spot-picker ${spots.length > 6 ? 'is-compact' : ''}`}>
         <legend>1 · Pick your spot</legend>
         {spots.map((s) => {
           const soldOut = s.quantity && (s.claimed || 0) >= s.quantity;
